@@ -75,7 +75,7 @@ ev_nodes
 
 # checking if there are any isolated nodes present
 degrees <- degree(epinions)
-isolated_nodes <- sum(degrees <= 2)
+isolated_nodes <- sum(degrees >= 12)
 isolated_nodes # 0 No isolated nodes present!
 
 #finding the mean of the degrees
@@ -93,5 +93,20 @@ plot(distribution, main = "Distribution", xlab = "Degree", ylab = "Frequency", l
 
 hist(igraph::degree(epinions))
 
+epinions_reduced <- delete.vertices(epinions, V(epinions)[degree(epinions) < 8])
+isolated_nodes <- which(degree(epinions_reduced) == 0)
+epinions_reduced <- delete.vertices(epinions_reduced, isolated_nodes)
+epinions_simplified <- simplify(epinions_reduced)
 
-wc <- walktrap.community(epinions, steps = 5)
+wf <- walktrap.community(epinions_simplified, steps = 5)
+plot(wf,epinions_simplified, vertex.size=0.5, layout=layout.fruchterman.reingold, vertex.label.cex = 0.5)
+
+
+cluster <- clusters(epinions_simplified)
+cluster
+
+subgraphs <- decompose(epinions_simplified)
+
+keep_graphs <- subgraphs[cluster$membership == 1]
+
+
